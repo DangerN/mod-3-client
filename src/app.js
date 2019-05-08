@@ -17,7 +17,8 @@ const exerciseModal = {
   close: document.querySelector('.exercise-close-button'),
   new: document.querySelector('#new-exercise-button'),
   newForm: document.querySelector('.new-exercise-form'),
-  newExerciseSubmit: document.querySelector('.new-exercise-submit')
+  newExerciseSubmit: document.querySelector('.new-exercise-submit'),
+  selectExercise: document.querySelector('#exercise-select')
 }
 
 const store = {}
@@ -109,6 +110,68 @@ function exerciseSelectBox() {
 function listenForExerciseInput() {
   exerciseModal.new.addEventListener('click', _ => {exerciseModal.newForm.style.display = 'block'})
   exerciseModal.newForm.addEventListener('submit', addAndBeginNewExercise)
+  exerciseModal.selectExercise.addEventListener('submit', exerciseSelector)
+}
+
+function exerciseSelector(event) {
+  event.preventDefault()
+  displayActiveSession(findExerciseById(exerciseModal.dropDown.value))
+}
+
+function displayActiveSession(exercise) {
+  let card = createExerciseCard(exercise)
+  // let counterBoxes = createCounterBoxes(exercise)
+  pageElements.main.appendChild(card)
+}
+
+function createExerciseCard(exercise) {
+  let card = document.createElement('div')
+  // card.appendChild(createCounterBoxes(exercise))
+  createCounterBoxes(exercise).forEach(counterBox => card.appendChild(counterBox))
+  return card
+}
+
+function createCounterBoxes(exercise) {
+  return exercise.exercise_type
+    .split(' ')
+    .map(numberBoxByTypeString)
+}
+
+function numberBoxByTypeString(typeString) {
+  let div = document.createElement('div')
+    div.classList.add('number-box')
+    div.innerHTML = `
+        <p class='number-box-title'>${typeString}</p>
+        <div class="digit-box">
+          <div class='counter-display'>00</div>
+          <button class='counter'>+</button>
+          <button class='counter'>-</button>
+        </div>
+    `
+    let counters = div.querySelectorAll('.counter')
+    let display = div.querySelector('.counter-display')
+    counters[0].addEventListener('click', event => adjustCounter(event, '+'))
+    counters[1].addEventListener('click', event => adjustCounter(event, '-'))
+    return div
+}
+
+function adjustCounter(event, operator) {
+  let displayNumbers = event.target.parentElement.querySelector('.counter-display')
+  switch (operator) {
+    case '+':
+      displayNumbers.innerHTML ++
+      break;
+    case '-':
+        displayNumbers.innerHTML --
+        break;
+    default:
+
+  }
+
+}
+
+function findExerciseById(id) {
+  return store.exercises.find( exercise => exercise.id == id)
 }
 
 function addAndBeginNewExercise(event) {
@@ -127,7 +190,7 @@ function addAndBeginNewExercise(event) {
     },
     body: JSON.stringify(postBody)
   })
-  // .then(response => response.json())
+  .then(response => response.json())
   .then(response => console.log(response))
   console.log(attributeString, exerciseName)
 }
@@ -160,17 +223,17 @@ function populateExerciseDropDown() {
   })
 }
 
-function createNewSession() {
-  let div = document.createElement('div')
-  div.classList.add('exercise-card')
-  div.innerHTML = `
-      <div class="number-box">
-        <div class='counter-display'>00</div>
-        <button class='counter'>+</button>
-        <button class='counter'>-</button>
-      </div>
-      <div class="number-box">00</div>
-      <a id="save-set">Save Set</a>
-  `
-  pageElements.main.appendChild(div)
-}
+// function createNewSession() {
+//   let div = document.createElement('div')
+//   div.classList.add('exercise-card')
+//   div.innerHTML = `
+//       <div class="number-box">
+//         <div class='counter-display'>00</div>
+//         <button class='counter'>+</button>
+//         <button class='counter'>-</button>
+//       </div>
+//       <div class="number-box">00</div>
+//       <a id="save-set">Save Set</a>
+//   `
+//   pageElements.main.appendChild(div)
+// }

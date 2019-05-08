@@ -39,9 +39,12 @@
         <span class="exercise-close-button">&times;</span>
         <p>select an exercise</p>
 
+        <form id='exercise-select'>
         <select class="exercise-dropdown" name="exercise"></select>
-        <button type="button" name="button">Select Exercise</button>
-        <button id="new-exercise-button"type="button" name="new-exercise">new exercise</button>
+        <button id="select-exercise" type="submit" value='Select'>Select Exercise</button>
+        </form>
+
+        <button id="new-exercise-button"type="button" name="new-exercise">New Exercise</button>
         <form class="new-exercise-form">
           <label for="name">Exercise Name:</label>
             <input type="text" name="name">
