@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>fT</title>
+    <link rel="stylesheet" href="src/style.css">
+  </head>
+  <body>
+    <!-- <style media="screen">
+
+    </style> -->
+    <div class="side-nav">
+      <a id='home-button'>fT</a>
+      <a id='out-button'>out</a>
+      <a id='in-button'>in</a>
+      <a id='record-button'>record</a>
+    </div>
+
+    <div class="context-menu">
+      <a href="#">IM A CONTEXT MENU :P</a>
+      <a href="#">IM A CONTEXT MENU :P</a>
+      <a href="#">IM A CONTEXT MENU :P</a>
+    </div>
+
+    <div class="main">
+          <div class="exercise-card">
+            <p>im the first card!</p>
+          </div>
+          <div class="exercise-card">
+            <p>im a second card!</p>
+          </div>
+        <p>main stuffs</p>
+        <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.""Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
+    </div>
+
+
+    <div id="exercise-modal">
+      <div class="modal-content">
+        <span class="exercise-close-button">&times;</span>
+        <p>select an exercise</p>
+
+        <select class="exercise-dropdown" name="exercise"></select>
+        <button type="button" name="button">Select Exercise</button>
+        <button id="new-exercise-button"type="button" name="new-exercise">new exercise</button>
+        <form class="new-exercise-form">
+          <label for="name">Exercise Name:</label>
+            <input type="text" name="name">
+          <label for="reps">Reps</label>
+            <input type="checkbox" name="reps" value="reps">
+          <label for="distance">Distance</label>
+            <input type="checkbox" name="distance" value="distance">
+          <label for="weight">Weight</label>
+            <input type="checkbox" name="weight" value="weight">
+          <label for="time">Time</label>
+            <input type="checkbox" name="time" value="time">
+          <input type="submit" id="new-exercise-submit" value="Create Exercise">
+        </form>
+      </div>
+
+    </div>
+
+
+
+    <script type="text/javascript" src="./src/app.js"></script>
+  </body>
+</html>
