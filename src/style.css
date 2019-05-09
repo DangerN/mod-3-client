@@ -61,6 +61,10 @@ body {
   vertical-align: top;
 }
 
+.number-box-title {
+  font-size: 10px;
+}
+
 .context-menu {
   height: 70px;
   width: auto;

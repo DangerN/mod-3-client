@@ -2,6 +2,8 @@ const apiBase = 'http://localhost:3000/api/v1/'
 
 const exercisePath = 'exercises'
 
+const exerciseSessionPath = 'exercise_sessions'
+
 const pageElements = {
     home:  document.querySelector('#home-button'),
     out: document.querySelector('#out-button'),
@@ -21,12 +23,20 @@ const exerciseModal = {
   selectExercise: document.querySelector('#exercise-select')
 }
 
+const validExerciseMetrics = ['reps', 'invalid']
+
 const store = {}
 
-fetch('http://localhost:3000/api/v1/exercises')
-  .then(response => response.json())
-  .then(response => store.exercises = response)
+const testSession = 1
+
+loadStore()
   .then(loadPage)
+
+function loadStore() {
+  return fetch(`${apiBase}${exercisePath}`)
+    .then(response => response.json())
+    .then(response => store.exercises = response)
+}
 
 function loadPage() {
   listenToNav()
@@ -116,19 +126,116 @@ function listenForExerciseInput() {
 function exerciseSelector(event) {
   event.preventDefault()
   displayActiveSession(findExerciseById(exerciseModal.dropDown.value))
+  resetSelectorBox()
 }
 
+function resetSelectorBox() {
+  exerciseModal.prompt.style.display = "none"
+  childDestroyer(exerciseModal.dropDown)
+}
 function displayActiveSession(exercise) {
   let card = createExerciseCard(exercise)
-  // let counterBoxes = createCounterBoxes(exercise)
   pageElements.main.appendChild(card)
 }
 
 function createExerciseCard(exercise) {
   let card = document.createElement('div')
-  // card.appendChild(createCounterBoxes(exercise))
+  card.classList.add('exercise-card')
   createCounterBoxes(exercise).forEach(counterBox => card.appendChild(counterBox))
+  addTitleToCard(card, exercise)
+  addButtonsToActiveCard(card)
   return card
+}
+
+function addTitleToCard(card, exercise) {
+  let span = document.createElement('span')
+  span.innerText = exercise.name
+  span.setAttribute('exercise-id', exercise.id)
+  span.classList.add('title')
+  card.appendChild(span)
+}
+function addButtonsToActiveCard(card) {
+  let span = document.createElement('span')
+  let button = document.createElement('button')
+  button.innerText = 'Save Set'
+  button.addEventListener('click', saveActiveSession)
+  span.appendChild(button)
+  card.appendChild(span)
+}
+
+function saveActiveSession(event) {
+  let data = getValuesFromActiveCard(event.target.parentElement.parentElement)
+  console.log(data)
+  fetch(`${apiBase}${exerciseSessionPath}`,{
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => response.json())
+  .then(showRecordCard)
+}
+
+function showRecordCard(sessionExerciseData) {
+  recordCard = createRecordCard(sessionExerciseData)
+  pageElements.main.appendChild(recordCard)
+  return sessionExerciseData
+}
+
+function createRecordCard(sessionExerciseData) {
+  let recordCard = document.createElement('div')
+  recordCard.setAttribute('exercise-session-id', sessionExerciseData.id)
+  let cardTitle = document.createElement('p')
+  cardTitle.innerText = findExerciseById(sessionExerciseData.exercise_id).name
+  makeStatBlocks(sessionExerciseData).forEach(stat => recordCard.appendChild(stat))
+  recordCard.appendChild(cardTitle)
+  return recordCard
+}
+
+function makeStatBlocks(sessionExerciseData) {
+  let statBlocks = []
+  paramHammer(validExerciseMetrics, sessionExerciseData)
+  if (sessionExerciseData.reps != null) {
+    let span = document.createElement('span')
+    span.innerText = `reps: ${sessionExerciseData.reps}`
+    statBlocks.push()
+  }
+  return statBlocks
+}
+
+//let params = 'an array of strings'
+//let hammerable = 'a js object'
+function paramHammer(params, hammerable) {
+  let hammered = []
+  for (let i = 0; i < params.length; i++) {
+    hammered[i] = {`${params[i]}`: `${hammerable[params[i]]}`}
+  }
+  // params.map(param => {
+  //   console.log('hammerable[param]:', hammerable[param])
+  //   console.log('param', param)
+  //   return hammerable[param]
+  // })
+  console.log('hammered:', hammered)
+  console.log('params:', params)
+  return hammered
+}
+
+function getValuesFromActiveCard(card) {
+  let numberBoxes = card.querySelectorAll('.number-box')
+  let data = {}
+  numberBoxes.forEach(box => numberBoxDataExtractor(box, data))
+  data['exercise_id'] = card.querySelector('.title').getAttribute('exercise-id')
+  data['session_id'] = testSession
+  return data
+}
+
+function numberBoxDataExtractor(box, data) {
+  let attribute = box.querySelector('.number-box-title').innerText
+  let value = box.querySelector('.counter-display').innerText
+  data[attribute] = value
+  return data
 }
 
 function createCounterBoxes(exercise) {
@@ -159,15 +266,14 @@ function adjustCounter(event, operator) {
   let displayNumbers = event.target.parentElement.querySelector('.counter-display')
   switch (operator) {
     case '+':
-      displayNumbers.innerHTML ++
+      if (displayNumbers.innerHTML < 99) {displayNumbers.innerHTML ++}
       break;
     case '-':
-        displayNumbers.innerHTML --
+        if (displayNumbers.innerHTML > 0) {displayNumbers.innerHTML --}
         break;
     default:
-
   }
-
+  if (displayNumbers.innerHTML < 10 && displayNumbers.innerHTML.length === 1) {displayNumbers.innerHTML = `0${displayNumbers.innerHTML}`}
 }
 
 function findExerciseById(id) {
@@ -182,6 +288,7 @@ function addAndBeginNewExercise(event) {
     name: exerciseName,
     exercise_type: attributeString
   }
+  console.log(postBody)
   fetch(`${apiBase}${exercisePath}`, {
     method: 'POST',
     headers: {
@@ -202,7 +309,7 @@ function getCheckedExerciseAttributes(form) {
       exerciseAttributes += ` ${input.name}`
     }
   }
-  return exerciseAttributes
+  return exerciseAttributes.slice(1)
 }
 
 function displayExerciseSelectBox() {
@@ -222,18 +329,3 @@ function populateExerciseDropDown() {
     exerciseModal.dropDown.appendChild(option)
   })
 }
-
-// function createNewSession() {
-//   let div = document.createElement('div')
-//   div.classList.add('exercise-card')
-//   div.innerHTML = `
-//       <div class="number-box">
-//         <div class='counter-display'>00</div>
-//         <button class='counter'>+</button>
-//         <button class='counter'>-</button>
-//       </div>
-//       <div class="number-box">00</div>
-//       <a id="save-set">Save Set</a>
-//   `
-//   pageElements.main.appendChild(div)
-// }
