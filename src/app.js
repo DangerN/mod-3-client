@@ -2,7 +2,9 @@ const apiBase = 'http://localhost:3000/api/v1/'
 
 const exercisePath = 'exercises'
 
-const exerciseSessionPath = 'exercise_sessions'
+const exerciseSessionsPath = 'exercise_sessions'
+
+const exerciseSessionPath = 'exercise_session/'
 
 const pageElements = {
     home:  document.querySelector('#home-button'),
@@ -23,7 +25,7 @@ const exerciseModal = {
   selectExercise: document.querySelector('#exercise-select')
 }
 
-const validExerciseMetrics = ['reps', 'invalid']
+const exerciseMetrics = ['reps', 'time', 'distance', 'weight']
 
 const store = {}
 
@@ -165,8 +167,7 @@ function addButtonsToActiveCard(card) {
 
 function saveActiveSession(event) {
   let data = getValuesFromActiveCard(event.target.parentElement.parentElement)
-  console.log(data)
-  fetch(`${apiBase}${exerciseSessionPath}`,{
+  fetch(`${apiBase}${exerciseSessionsPath}`,{
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -189,38 +190,65 @@ function createRecordCard(sessionExerciseData) {
   recordCard.setAttribute('exercise-session-id', sessionExerciseData.id)
   let cardTitle = document.createElement('p')
   cardTitle.innerText = findExerciseById(sessionExerciseData.exercise_id).name
-  makeStatBlocks(sessionExerciseData).forEach(stat => recordCard.appendChild(stat))
   recordCard.appendChild(cardTitle)
+  let exerciseData = sessionExerciseDataMetricExtractor(sessionExerciseData)
+  makeStatBlocks(exerciseData).forEach(stat => recordCard.appendChild(stat))
+  makeRecordCardButtons(exerciseData).forEach(button => recordCard.appendChild(button))
   return recordCard
 }
 
-function makeStatBlocks(sessionExerciseData) {
+function makeRecordCardButtons(sessionExerciseData) {
+  let editButton = document.createElement('button')
+  let deleteButton = document.createElement('button')
+  editButton.innerText = 'Edit'
+  deleteButton.innerText = 'Delete'
+  deleteButton.addEventListener('click', event => deleteRecordCard(event, sessionExerciseData.id))
+  editButton.addEventListener('click', event => editRecordCard(event))
+  return [editButton, deleteButton]
+}
+
+function deleteRecordCard(event, sessionExerciseId) {
+  let recordCard = event.target.parentElement
+  let exerciseSessionID = recordCard.getAttribute('exercise-session-id')
+  deleteSessionExerciseById(exerciseSessionID)
+
+}
+
+function deleteSessionExerciseById(id) {
+  let data = {
+    id: `${id}`
+  }
+    fetch(`${apiBase}${exerciseSessionsPath}/${id}`, {
+      method: 'DELETE',
+    })
+    .then(response => response.json())
+    .then(console.log)
+}
+
+function editRecordCard(event) {
+
+}
+
+function sessionExerciseDataMetricExtractor(sessionExerciseData) {
+  let metrics = {}
+  exerciseMetrics.forEach(metric => {
+    if (sessionExerciseData[metric] != null){
+      metrics[metric] = sessionExerciseData[metric]
+    }
+  })
+  return metrics
+}
+
+function makeStatBlocks(exerciseData) {
   let statBlocks = []
-  paramHammer(validExerciseMetrics, sessionExerciseData)
-  if (sessionExerciseData.reps != null) {
+  for (let datum in exerciseData){
     let span = document.createElement('span')
-    span.innerText = `reps: ${sessionExerciseData.reps}`
-    statBlocks.push()
+    span.innerText = `${datum}: ${exerciseData[datum]}`
+    statBlocks.push(span)
   }
   return statBlocks
 }
 
-//let params = 'an array of strings'
-//let hammerable = 'a js object'
-function paramHammer(params, hammerable) {
-  let hammered = []
-  for (let i = 0; i < params.length; i++) {
-    hammered[i] = {`${params[i]}`: `${hammerable[params[i]]}`}
-  }
-  // params.map(param => {
-  //   console.log('hammerable[param]:', hammerable[param])
-  //   console.log('param', param)
-  //   return hammerable[param]
-  // })
-  console.log('hammered:', hammered)
-  console.log('params:', params)
-  return hammered
-}
 
 function getValuesFromActiveCard(card) {
   let numberBoxes = card.querySelectorAll('.number-box')
