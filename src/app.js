@@ -15,6 +15,14 @@ const pageElements = {
     main: document.querySelector('.main')
 }
 
+const authModal = {
+  prompt: document.querySelector('.bologna-auth'),
+  form: document.querySelector('#auth-form'),
+  email: document.querySelector('#auth-email'),
+  password: document.querySelector('#auth-password'),
+  signInButton: document.querySelector('#sign-in-button')
+}
+
 const exerciseModal = {
   prompt: document.querySelector('#exercise-modal'),
   dropDown: document.querySelector('.exercise-dropdown'),
@@ -25,22 +33,61 @@ const exerciseModal = {
   selectExercise: document.querySelector('#exercise-select')
 }
 
+const editRecordModal = {
+  prompt: document.querySelector('.edit-record-modal'),
+  container: document.querySelector('.edit-record-content')
+}
+
 const exerciseMetrics = ['reps', 'time', 'distance', 'weight']
 
 const store = {}
 
+const currentSession = 1
+
 const testSession = 1
 
+let currentUserId = 0
+
 loadStore()
-  .then(loadPage)
+  .then(bolognaAuth)
 
 function loadStore() {
+  return loadExercises()
+    .then(loadExerciseSessions)
+    .then(loadSessions)
+    .then(loadUsers)
+}
+
+function loadExercises() {
   return fetch(`${apiBase}${exercisePath}`)
     .then(response => response.json())
     .then(response => store.exercises = response)
+    .then(console.log)
+}
+
+function loadExerciseSessions() {
+  return fetch(`${apiBase}${exerciseSessionsPath}`)
+    .then(response => response.json())
+    .then(response => store.exerciseSessions = response)
+    .then(console.log)
+}
+
+function loadSessions() {
+  return fetch(`${apiBase}sessions`)
+    .then(response => response.json())
+    .then(response => store.sessions = response)
+    .then(console.log)
+}
+
+function loadUsers() {
+  return fetch(`${apiBase}users`)
+    .then(response => response.json())
+    .then(response => store.users = response)
+    .then(console.log)
 }
 
 function loadPage() {
+  showHome()
   listenToNav()
 }
 
@@ -68,7 +115,29 @@ function childDestroyer(parent) {
 
 function showHome() {
   clearMain()
+  welcomCurrentUser()
   showContextMenu('home')
+}
+
+function bolognaAuth() {
+  authModal.prompt.style.display = 'block'
+  authModal.form.addEventListener('submit', userEmailValidate)
+}
+
+function userEmailValidate(event) {
+  event.preventDefault()
+  let user = findUserByEmail(authModal.email.value)
+  if (user) {
+    currentUserId = user.id
+    authModal.prompt.style.display = 'none'
+    loadPage()
+  } else {
+    alert('user not found')
+  }
+}
+
+function findUserByEmail(email) {
+  return store.users.find(user => user.email === email)
 }
 
 function showOut() {
@@ -84,6 +153,25 @@ function showIn() {
 function showRecord() {
   clearMain()
   showContextMenu('record')
+  populatRecordPage()
+}
+
+function populatRecordPage(){
+  store.exerciseSessions.forEach(showRecordCard)
+}
+
+function welcomCurrentUser() {
+  let h1 = document.createElement('h1')
+  h1.innerText = `Welcome: ${getNameByUserId(currentUserId)}`
+  pageElements.main.appendChild(h1)
+}
+
+function getNameByUserId(userId) {
+  return getUserById(userId).name
+}
+
+function getUserById(userId) {
+  return store.users.find(user => user.id === userId)
 }
 
 function showContextMenu(context) {
@@ -180,6 +268,7 @@ function saveActiveSession(event) {
 }
 
 function showRecordCard(sessionExerciseData) {
+  console.log(sessionExerciseData);
   recordCard = createRecordCard(sessionExerciseData)
   pageElements.main.appendChild(recordCard)
   return sessionExerciseData
@@ -188,6 +277,7 @@ function showRecordCard(sessionExerciseData) {
 function createRecordCard(sessionExerciseData) {
   let recordCard = document.createElement('div')
   recordCard.setAttribute('exercise-session-id', sessionExerciseData.id)
+  recordCard.classList.add('record-card')
   let cardTitle = document.createElement('p')
   cardTitle.innerText = findExerciseById(sessionExerciseData.exercise_id).name
   recordCard.appendChild(cardTitle)
@@ -203,7 +293,7 @@ function makeRecordCardButtons(sessionExerciseData) {
   editButton.innerText = 'Edit'
   deleteButton.innerText = 'Delete'
   deleteButton.addEventListener('click', event => deleteRecordCard(event, sessionExerciseData.id))
-  editButton.addEventListener('click', event => editRecordCard(event))
+  editButton.addEventListener('click', event => editRecordCard(event, sessionExerciseData))
   return [editButton, deleteButton]
 }
 
@@ -211,22 +301,40 @@ function deleteRecordCard(event, sessionExerciseId) {
   let recordCard = event.target.parentElement
   let exerciseSessionID = recordCard.getAttribute('exercise-session-id')
   deleteSessionExerciseById(exerciseSessionID)
-
+  recordCard.parentNode.removeChild(recordCard)
 }
 
 function deleteSessionExerciseById(id) {
-  let data = {
-    id: `${id}`
-  }
-    fetch(`${apiBase}${exerciseSessionsPath}/${id}`, {
-      method: 'DELETE',
-    })
-    .then(response => response.json())
-    .then(console.log)
+  fetch(`${apiBase}${exerciseSessionsPath}/${id}`, {method: 'DELETE'})
 }
 
-function editRecordCard(event) {
+function editRecordCard(event, sessionExerciseData) {
+  let recordCard = event.target.parentElement
+  let statSpans = recordCard.querySelectorAll('.stat-span')
+  // let yeet = statSpansDataExtractor(statSpans)
+  let yeet = createEditCounters(statSpans)
+  console.log(yeet);
+  for (var yee in yeet) {
+    console.log(yee);
+    editRecordModal.container.appendChild(yee)
+  }
+  editRecordModal.prompt.style.display = 'block'
+}
 
+function createEditCounters(statSpans) {
+  return Array.from(statSpans).map(span => numberBoxByTypeString(span.innerHTML.split(': ')[0]))
+}
+
+function statSpansDataExtractor(statSpans) {
+  let output = {}
+  for (var span in statSpans) {
+    if (statSpans[span].innerText != undefined)
+    {
+      let data = statSpans[span].innerText.split(': ')
+      output[data[0]] = span[1]
+    }
+  }
+  return output
 }
 
 function sessionExerciseDataMetricExtractor(sessionExerciseData) {
@@ -244,6 +352,7 @@ function makeStatBlocks(exerciseData) {
   for (let datum in exerciseData){
     let span = document.createElement('span')
     span.innerText = `${datum}: ${exerciseData[datum]}`
+    span.classList.add('stat-span')
     statBlocks.push(span)
   }
   return statBlocks
@@ -316,7 +425,6 @@ function addAndBeginNewExercise(event) {
     name: exerciseName,
     exercise_type: attributeString
   }
-  console.log(postBody)
   fetch(`${apiBase}${exercisePath}`, {
     method: 'POST',
     headers: {
@@ -326,8 +434,8 @@ function addAndBeginNewExercise(event) {
     body: JSON.stringify(postBody)
   })
   .then(response => response.json())
-  .then(response => console.log(response))
-  console.log(attributeString, exerciseName)
+  .then(response => {store.exercises.push(response); return response})
+  .then(response => {displayActiveSession(response); resetSelectorBox()})
 }
 
 function getCheckedExerciseAttributes(form) {

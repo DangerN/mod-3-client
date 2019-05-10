@@ -2,10 +2,54 @@ body {
   font-family: "Courier", monospace;
   margin: 0px;
 }
+.edit-record-modal {
+  display: none;
+  position: fixed;
+  z-index: 2;
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.edit-record-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
 
 .new-exercise-form {
   display: none;
   border-color: rgb(255, 0, 0);
+}
+
+
+.bologna-auth {
+  display: none;
+  position: fixed;
+  z-index: 2;
+  padding-top: 100px; /* Location of the box */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgb(0,0,0); /* Fallback color */
+  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+
+.auth-content {
+  background-color: #fefefe;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
 }
 
 #exercise-modal {
@@ -46,10 +90,27 @@ body {
 
 .exercise-card {
   border-style: dashed;
+  border-radius: 15px;
   width: auto;
   height: 80px;
   margin: 2%;
   padding: 2%;
+}
+
+.record-card {
+  border-top-style: inset;
+  border-left-style: inset;
+  border-radius: 15px;
+  border-bottom-style: inset;
+  border-right-style: inset;
+  border-bottom-width: 1px;
+  border-right-width: 1px;
+  margin-bottom: 15px;
+  padding-bottom: 3px;
+}
+
+.record-card span {
+  margin-left: 10px;
 }
 
 .number-box{
@@ -96,6 +157,7 @@ body {
   background-color: #111;
   overflow-x: hidden;
   padding-top: 20px;
+  box-shadow: 1px 1px 5px;
 }
 
 .side-nav a {

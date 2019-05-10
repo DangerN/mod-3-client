@@ -26,8 +26,8 @@
           <div class="exercise-card">
             <p>im the first card!</p>
           </div>
-          <div class="exercise-card">
-            <p>im a second card!</p>
+          <div class="record-card">
+            <p>im a record card!</p>
           </div>
         <p>main stuffs</p>
         <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.""Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."</p>
@@ -59,9 +59,24 @@
           <input type="submit" id="new-exercise-submit" value="Create Exercise">
         </form>
       </div>
-
     </div>
 
+    <div class="bologna-auth">
+      <div class="auth-content">
+        <h2>please sign in</h2>
+        <form id="auth-form">
+          <input id="auth-email" type="text" name="user" placeholder="email">
+          <input id="auth-password"type="text" name="password" placeholder="password" disabled>
+          <button id="sign-in-button" type="submit" name="button">sign in</button>
+        </form>
+        <button type="button" name="button" disabled>new user</button>
+      </div>
+    </div>
+
+    <div class="edit-record-modal">
+      <div class="edit-record-content">
+      </div>
+    </div>
 
 
     <script type="text/javascript" src="./src/app.js"></script>
