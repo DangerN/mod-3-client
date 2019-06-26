@@ -2,7 +2,7 @@
 This app helps you to achieve your fitness goals by giving you the ability to easily record your sets, sessions, and exercises.
 
 ## How to Use
-Sign in is required to use this app. Unfortunately user creation is not open at this time.
+Sign in is required to use this app. Unfortunately user creation is not implemented at this time.
 
 ## To Do
 * Allow users to sign up.
