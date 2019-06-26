@@ -5,8 +5,8 @@ This app helps you to achieve your fitness goals by giving you the ability to ea
 Sign in is required to use this app. Unfortunately user creation is not open at this time.
 
 ## To Do
-*Allow users to sign up.
-*Implement JWT auth.
-*Clean up UI.
-*Organize data better.
-*Enable water and Calorie tracking.
+* Allow users to sign up.
+* Implement JWT auth.
+* Clean up UI.
+* Organize data better.
+* Enable water and Calorie tracking.
