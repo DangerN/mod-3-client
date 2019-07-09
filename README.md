@@ -10,3 +10,6 @@ Sign in is required to use this app. Unfortunately user creation is not implemen
 * Clean up UI.
 * Organize data better.
 * Enable water and Calorie tracking.
+
+# Attention
+This app is no longer under development. View the next iteration [here](https://github.com/dangern/fitnessTracker).
